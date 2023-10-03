@@ -42,9 +42,7 @@ static_resources:
                           - prefix: "*"
                         allow_methods: GET
                         #, PUT, DELETE, POST, OPTIONS
-                        # custom-header-1 is just an example. the grpc-web
-                        # repository was missing grpc-status-details-bin header
-                        # which used in a richer error model.
+                        # check the richer-error-model for future updates
                         # https://grpc.io/docs/guides/error/#richer-error-model
                         allow_headers: keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,grpc-status-details-bin,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout,authorization
                         expose_headers: grpc-status-details-bin,grpc-status,grpc-message,authorization
@@ -55,10 +53,10 @@ static_resources:
 #                    typed_config:
 #                      # https://www.envoyproxy.io/docs/envoy/v1.15.0/api-v3/extensions/filters/http/grpc_web/v3/grpc_web.proto
 #                      "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb
-                  - name: envoy.filters.http.cors
-                    typed_config:
-                      # https://www.envoyproxy.io/docs/envoy/v1.15.0/api-v3/extensions/filters/http/cors/v3/cors.proto
-                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+#                  - name: envoy.filters.http.cors
+#                    typed_config:
+#                      # https://www.envoyproxy.io/docs/envoy/v1.15.0/api-v3/extensions/filters/http/cors/v3/cors.proto
+#                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                   - name: envoy.filters.http.router
                     typed_config:
                       # https://www.envoyproxy.io/docs/envoy/v1.15.0/api-v3/extensions/filters/http/router/v3/router.proto
