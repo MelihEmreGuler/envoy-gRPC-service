@@ -1,5 +1,8 @@
 services:
+
   grpc-server:
+    ports:
+      - "50051:50051"
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,6 +13,8 @@ services:
       dockerfile: Dockerfile
       args:
         ENVOY_CONFIG: ./envoy/envoy.yaml
+    ports:
+      - "8080:8080"
 
 #  grpc-client:
 #    build:

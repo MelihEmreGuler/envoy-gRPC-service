@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	addr   = flag.String("addr", "localhost:8080", "the address to connect to")
+	addr   = flag.String("addr", "0.0.0.0:8080", "the address to connect to")
 	region = flag.String("region", "us-east-1", "the region to query")
 )
 
