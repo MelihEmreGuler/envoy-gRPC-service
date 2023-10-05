@@ -7,7 +7,7 @@ import (
 	"log"
 	"sync"
 
-	pb "github.com/MelihEmreGuler/envoy-gRPC-service/instance/instancepb"
+	pb "github.com/MelihEmreGuler/envoy-gRPC-service/instancepb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

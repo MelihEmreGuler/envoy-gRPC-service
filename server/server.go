@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	pb "github.com/MelihEmreGuler/envoy-gRPC-service/instance/instancepb"
+	pb "github.com/MelihEmreGuler/envoy-gRPC-service/instancepb"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/grpc"
 	"log"

@@ -1,0 +1,17 @@
+services:
+  grpc-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  grpc-server-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ENVOY_CONFIG: ./envoy/envoy.yaml
+
+#  grpc-client:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile-client
