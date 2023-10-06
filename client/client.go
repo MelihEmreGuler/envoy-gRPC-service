@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	addr   = flag.String("addr", "0.0.0.0:8080", "the address to connect to")
+	addr   = flag.String("addr", "192.168.207.2:8080", "the address to connect to")
 	region = flag.String("region", "us-east-1", "the region to query")
 )
 
@@ -28,7 +28,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
 	}
-	defer conn.Close()
+
+	//defer conn.Close()
 	client := pb.NewInstanceClient(conn)
 	// Create a context with a timeout
 	ctx := context.Background()

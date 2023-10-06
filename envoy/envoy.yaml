@@ -4,7 +4,7 @@ static_resources:
     - name: listener_0
       address:
         socket_address:
-          address: 0.0.0.0
+          address: 192.168.207.2
           port_value: 8080
       filter_chains:
         - filters:
@@ -75,7 +75,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: 0.0.0.0
+                      address: 192.168.207.3
                       port_value: 50051
       http2_protocol_options: {} # Force HTTP/2
       # Your grpc server communicates over TLS. You must configure the transport

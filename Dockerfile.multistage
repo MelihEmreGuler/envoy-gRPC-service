@@ -31,4 +31,4 @@ USER nonroot:nonroot
 ENTRYPOINT ["/client-build"]
 
 # console command:
-#docker build -t instance-client:multistage -f Dockerfile.multistage .
+#docker build -t instance-client:multistage -f Dockerfile-envoy.multistage .

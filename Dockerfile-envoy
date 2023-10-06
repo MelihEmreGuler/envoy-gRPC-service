@@ -1,0 +1,17 @@
+# Use a minimal base image to keep the image size small
+FROM envoyproxy/envoy:v1.15.0 as envoy
+
+# Copy your Envoy configuration file to the appropriate location in the container
+COPY /envoy/envoy.yaml /envoy/envoy.yaml
+
+# Expose the ports that Envoy will listen on (e.g., 8080 for HTTP)
+EXPOSE 8080
+
+# Specify the command to start Envoy with your configuration
+CMD ["envoy", "-c", "/etc/envoy/envoy.yaml"]
+
+
+
+
+
+
