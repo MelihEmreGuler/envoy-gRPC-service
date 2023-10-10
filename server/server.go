@@ -1,50 +1,22 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	pb "github.com/MelihEmreGuler/envoy-gRPC-service/instancepb"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/encoding/protojson"
+	"io/ioutil"
 	"log"
 	"net"
+	"os"
 )
 
 var (
-	port            = flag.Int("port", 50051, "The server port")
-	sampleInstances = []*pb.Instance{
-		{
-			AmiLaunchIndex: 1,
-			Architecture:   pb.ArchitectureValues_X86_64,
-			BlockDeviceMappings: []*pb.InstanceBlockDeviceMapping{
-				{
-					DeviceName: "sda1",
-					Ebs: &pb.EbsInstanceBlockDevice{
-						AttachTime:          &timestamp.Timestamp{Seconds: 1629434214},
-						DeleteOnTermination: true,
-						Status:              pb.AttachmentStatus_attached,
-						VolumeId:            "vol-0123456789abcdef0",
-					},
-				},
-			},
-		},
-		{
-			AmiLaunchIndex: 2,
-			Architecture:   pb.ArchitectureValues_arm64,
-			BlockDeviceMappings: []*pb.InstanceBlockDeviceMapping{
-				{
-					DeviceName: "sdb1",
-					Ebs: &pb.EbsInstanceBlockDevice{
-						AttachTime:          &timestamp.Timestamp{Seconds: 1629434214},
-						DeleteOnTermination: false,
-						Status:              pb.AttachmentStatus_detached,
-						VolumeId:            "vol-0fedcba9876543210",
-					},
-				},
-			},
-		},
-		// Add more instances as needed
-	}
+	port = flag.Int("port", 50051, "The server port")
+	// Create a channel to signal when instances are ready
+	//instancesReadyCh = make(chan struct{})
 )
 
 type instanceServer struct {
@@ -52,8 +24,67 @@ type instanceServer struct {
 	instances []*pb.Instance
 }
 
-// Create a channel to signal when instances are ready
-var instancesReadyCh = make(chan struct{})
+func readJSONFile() (error, []byte) {
+	// Open the JSON file
+	filePath := "server/instance.json"
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatalf("Error opening JSON file %v", err)
+		return err, nil
+	}
+	defer file.Close() // Ensure the file is closed when done.
+
+	// Create a buffered reader to read the JSON data
+	reader := bufio.NewReader(file)
+
+	// Read the JSON data from the file.
+	jsonData, err := ioutil.ReadAll(reader)
+	if err != nil {
+		log.Fatalf("error reading JSON: %v", err)
+		return err, nil
+	}
+
+	// Return the JSON data
+	return nil, jsonData
+}
+
+func unmarshalJSON(data []byte) (error, []*pb.Instance) {
+
+	// Create a response object
+	response := &pb.GetInstancesByRegionResponse{}
+
+	//Unmarshal the JSON data into the interface.
+	err := protojson.Unmarshal(data, response)
+	if err != nil {
+		return err, nil
+	}
+
+	//return the instances
+	return nil, response.Instances
+}
+
+func (s *instanceServer) loadInstances() {
+	// Read the JSON data from the file.
+	err, jsonByte := readJSONFile()
+	if err != nil {
+		log.Fatalf("error reading JSON: %v", err)
+	}
+
+	// Unmarshal the JSON data into the proto message.
+	err, message := unmarshalJSON(jsonByte)
+	if err != nil {
+		log.Fatalf("error unmarshalling JSON: %v", err)
+	}
+
+	s.instances = message
+}
+
+func newServer() *instanceServer {
+	s := &instanceServer{instances: make([]*pb.Instance, 0)}
+	s.loadInstances()
+	fmt.Println("instances loaded", s.instances)
+	return s
+}
 
 // GetInstancesByRegion returns the instances in the given region.
 func (s *instanceServer) GetInstancesByRegion(req *pb.GetInstancesByRegionRequest, stream pb.Instance_GetInstancesByRegionServer) error {
@@ -66,6 +97,7 @@ func (s *instanceServer) GetInstancesByRegion(req *pb.GetInstancesByRegionReques
 		close(instancesReadyCh)
 	}()*/
 
+	// Send the instances to the client with a stream
 	err := stream.Send(&pb.GetInstancesByRegionResponse{Instances: s.instances})
 	if err != nil {
 		return err
@@ -77,6 +109,8 @@ func (s *instanceServer) GetInstancesByRegion(req *pb.GetInstancesByRegionReques
 
 // SendStatusUpdates sends status updates to the client.
 func (s *instanceServer) SendStatusUpdates(req *pb.GetInstancesByRegionRequest, stream pb.Instance_SendStatusUpdatesServer) error {
+	log.Printf("Received SendStatusUpdates request from client: \n %+v\n", req)
+
 	// Notify the client that scanning is starting
 	statusUpdate := &pb.StatusUpdate{Message: "Scanning started..."}
 	if err := stream.Send(statusUpdate); err != nil {
@@ -96,23 +130,23 @@ func (s *instanceServer) SendStatusUpdates(req *pb.GetInstancesByRegionRequest, 
 	return nil
 }
 
-func newServer() *instanceServer {
-	s := &instanceServer{
-		instances: sampleInstances,
-	}
-	return s
-}
-
 func main() {
+	// parse the port flag
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", *port))
+
+	// Create a listener on port 50051
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	var opts []grpc.ServerOption
 
+	// Register your gRPC service implementation
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterInstanceServer(grpcServer, newServer())
+
+	// Serve gRPC listener
 	err = grpcServer.Serve(lis)
 	if err != nil {
 		log.Fatalf("failed to serve: %v", err)

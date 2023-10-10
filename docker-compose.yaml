@@ -1,28 +1,25 @@
 services:
-
   grpc-server:
-#    networks:
-#      - mynetwork
-    ports:
-      - "50051:50051"
+    container_name: "grpc-server"
+    networks:
+      - envoy-server-network
     build:
       context: .
       dockerfile: Dockerfile-server
 
-  grpc-server-proxy:
-#    networks:
-#      - mynetwork
+  envoy-proxy:
+    networks:
+      - envoy-server-network
+    ports:
+      - "8080:8080"
     build:
       context: .
       dockerfile: Dockerfile-envoy
-      args:
-        ENVOY_CONFIG: ./envoy/envoy.yaml
-    ports:
-      - "8080:8080"
 
-#networks:
-#  mynetwork:
-#    driver: bridge
+networks:
+  envoy-server-network:
+    driver: bridge
+
 #  grpc-client:
 #    build:
 #      context: .

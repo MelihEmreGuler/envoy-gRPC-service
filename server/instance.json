@@ -1,0 +1,33 @@
+{
+  "instances": [
+    {
+      "AmiLaunchIndex": 1,
+      "Architecture": "X86_64",
+      "BlockDeviceMappings": [
+        {
+          "DeviceName": "sda1",
+          "Ebs": {
+            "AttachTime": "2021-08-20T04:36:54Z",
+            "DeleteOnTermination": true,
+            "Status": "attached",
+            "VolumeId": "vol-0123456789abcdef0"
+          }
+        }
+      ]
+    },
+    {
+      "AmiLaunchIndex": 2,
+      "Architecture": "arm64",
+      "BlockDeviceMappings": [
+        {
+          "DeviceName": "sdb1",
+          "Ebs": {
+            "AttachTime": "2021-08-20T04:36:54Z",
+            "Status": "detached",
+            "VolumeId": "vol-0fedcba9876543210"
+          }
+        }
+      ]
+    }
+  ]
+}

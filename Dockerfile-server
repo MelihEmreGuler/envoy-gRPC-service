@@ -15,7 +15,7 @@ COPY instancepb ./instancepb
 
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /server-built
+RUN CGO_ENABLED=0 GOOS=linux go build -o /grpc-server
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.
@@ -25,6 +25,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /server-built
 EXPOSE 50051
 
 # Run
-CMD ["/server-built"]
+CMD ["/grpc-server"]
 
 #docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 3369f86f493
+
+#- localhostte tarayıcı client ile örnek
+#- docker de tamamen kopyalaya yapistir ornek
